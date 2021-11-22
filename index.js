@@ -1,5 +1,4 @@
 // ------------------------- // CONSTANTS
-
 const player = document.getElementById('player');
 const gameContainer = document.querySelector('.container');
 
@@ -15,7 +14,6 @@ RIGHT_TOP = 'right top';
 LEFT_BOTTOM = 'left bottom';
 RIGHT_BOTTOM = 'right bottom';
 // ------------------------ //
-
 
 // -------------------------------- // RENDERER
 const renderer = {
@@ -61,9 +59,8 @@ const renderer = {
 
 const movePlayer = (direction) => {
     const bricks = document.querySelectorAll('.brick');
-
     const nearBrick = [...bricks]
-        .map(brick => getNearBrickLocation(brick))
+        .map(brick => getNearBrickLocation(brick, player))
         .filter(brickLocation => brickLocation !== undefined);
 
     switch (direction) {
@@ -109,30 +106,60 @@ const getPlayerDirection = () => {
     }
 }
 
-const getNearBrickLocation = (brick) => {
+const getNearBrickLocation = (brick, elem) => {
     const brickLeft = brick.offsetLeft - 10;
     const brickTop = brick.offsetTop - 10;
     const brickRight = brickLeft + brick.offsetWidth + 10;
     const brickBottom = brickTop + brick.offsetHeight + 10;
 
-    const playerLeft = player.offsetLeft;
-    const playerTop = player.offsetTop;
-    const playerRight = playerLeft + player.offsetWidth;
-    const playerBottom = playerTop + player.offsetHeight;
+    const elemLeft = elem.offsetLeft;
+    const elemTop = elem.offsetTop;
+    const elemRight = elemLeft + elem.offsetWidth;
+    const elemBottom = elemTop + elem.offsetHeight;
 
-    if (playerTop <= brickBottom && playerTop >= brickTop && playerLeft <= brickRight && playerLeft >= brickLeft) {
+    if (elemTop <= brickBottom && elemTop >= brickTop && elemLeft <= brickRight && elemLeft >= brickLeft) {
         return LEFT_TOP;
     }
-    else if (playerTop >= brickTop && playerTop <= brickBottom && playerRight >= brickLeft && playerRight <= brickRight) {
+    else if (elemTop >= brickTop && elemTop <= brickBottom && elemRight >= brickLeft && elemRight <= brickRight) {
         return RIGHT_TOP;
     }
-    else if (playerBottom >= brickTop && playerBottom <= brickBottom && playerRight >= brickLeft && playerRight <= brickRight) {
+    else if (elemBottom >= brickTop && elemBottom <= brickBottom && elemRight >= brickLeft && elemRight <= brickRight) {
         return RIGHT_BOTTOM;
     }
-    else if (playerBottom >= brickTop && playerBottom <= brickBottom && playerLeft >= brickLeft && playerLeft <= brickRight) {
+    else if (elemBottom >= brickTop && elemBottom <= brickBottom && elemLeft >= brickLeft && elemLeft <= brickRight) {
         return LEFT_BOTTOM;
     }
     return
+}
+
+const getNearEnemyLocation = (enemy, elem) => {
+    const enemyLeft = enemy.offsetLeft - 10;
+    const enemyTop = enemy.offsetTop - 10;
+    const enemyRight = enemyLeft + enemy.offsetWidth + 10;
+    const enemyBottom = enemyTop + enemy.offsetHeight + 10;
+
+    const elemLeft = elem.offsetLeft;
+    const elemTop = elem.offsetTop;
+    const elemRight = elemLeft + elem.offsetWidth;
+    const elemBottom = elemTop + elem.offsetHeight;
+
+    if (elemTop <= enemyBottom && elemTop >= enemyTop && elemLeft <= enemyRight && elemLeft >= enemyLeft) {
+        return LEFT_TOP;
+    }
+    else if (elemTop >= enemyTop && elemTop <= enemyBottom && elemRight >= enemyLeft && elemRight <= enemyRight) {
+        return RIGHT_TOP;
+    }
+    else if (elemBottom >= enemyTop && elemBottom <= enemyBottom && elemRight >= enemyLeft && elemRight <= enemyRight) {
+        return RIGHT_BOTTOM;
+    }
+    else if (elemBottom >= enemyTop && elemBottom <= enemyBottom && elemLeft >= enemyLeft && elemLeft <= enemyRight) {
+        return LEFT_BOTTOM;
+    }
+    return
+}
+
+const enemyDie = (enemy) => {
+    enemy.remove();
 }
 
 const shoot = () => {
@@ -162,26 +189,61 @@ const shoot = () => {
 }
 
 const laserMovingAnimation = (laser, details) => {
-    const moving = setInterval(details, 100);
+    const moving = setInterval(details, 50);
     setTimeout(() => {
         clearInterval(moving);
         laser.remove();
     }, 2000);
 }
 
+const isLaserHitWall = (laser) => {
+    const bricks = document.querySelectorAll('.brick');
+    const nearBrick = [...bricks]
+        .map(brick => getNearBrickLocation(brick, laser))
+        .filter(brickLocation => brickLocation !== undefined);
+    if (nearBrick.includes(LEFT_TOP) ||
+        nearBrick.includes(RIGHT_TOP) ||
+        nearBrick.includes(LEFT_BOTTOM) ||
+        nearBrick.includes(RIGHT_BOTTOM)) {
+        laser.remove(); return;
+    }
+}
+
+const isLaserHitEnemy = (laser) => {
+    const enemies = document.querySelectorAll('.enemy');
+    let indexOfHittedTank;
+    const nearEnemiesLocations = [...enemies].map(enemy => getNearEnemyLocation(enemy, laser));
+    nearEnemiesLocations.forEach((enemyLocation, index) => {
+        if (enemyLocation) indexOfHittedTank = index;
+    })
+    const nearEnemiesHittedLocations = nearEnemiesLocations.filter(enemyLocation => enemyLocation !== undefined);
+    if (nearEnemiesHittedLocations.includes(LEFT_TOP) ||
+        nearEnemiesHittedLocations.includes(RIGHT_TOP) ||
+        nearEnemiesHittedLocations.includes(LEFT_BOTTOM) ||
+        nearEnemiesHittedLocations.includes(RIGHT_BOTTOM)) {
+        enemyDie(enemies[indexOfHittedTank]);
+        laser.remove();
+    }
+}
+
 const moveLaser = (laser, direction) => {
+    const checkObstacales = () => {
+        isLaserHitWall(laser);
+        isLaserHitEnemy(laser);
+    }
+
     let details;
     if (direction === TOP) {
-        details = () => { laser.style.top = (parseInt(laser.style.top)) - 80 + 'px' };
+        details = () => { checkObstacales(); laser.style.top = (parseInt(laser.style.top)) - 40 + 'px' };
     }
     if (direction === BOTTOM) {
-        details = () => { laser.style.top = (parseInt(laser.style.top)) + 80 + 'px' };
+        details = () => { checkObstacales(); laser.style.top = (parseInt(laser.style.top)) + 40 + 'px' };
     }
     if (direction === LEFT) {
-        details = () => { laser.style.left = (parseInt(laser.style.left)) - 80 + 'px' };
+        details = () => { checkObstacales(); laser.style.left = (parseInt(laser.style.left)) - 40 + 'px' };
     }
     if (direction === RIGHT) {
-        details = () => { laser.style.left = (parseInt(laser.style.left)) + 80 + 'px' };
+        details = () => { checkObstacales(); laser.style.left = (parseInt(laser.style.left)) + 40 + 'px' };
     }
     laserMovingAnimation(laser, details);
 }
@@ -207,12 +269,13 @@ function main() {
         if (event.key === 'ArrowDown') {
             movePlayer('bottom');
         }
-    })
+    });
 
     document.addEventListener('keydown', (event) => {
         if (event.code === 'Space') {
+            event.preventDefault();
             shoot();
         }
-    })
+    });
 }
 main();

@@ -15,7 +15,6 @@ body {
   margin: 0 auto;
   width: 2000px;
   height: 1600px;
-  border: 1px solid #fff;
   position: relative;
   display: flex;
   flex-wrap: wrap;
@@ -42,12 +41,26 @@ body {
 }
 
 .enemy {
-  width: 5em;
-  height: 5em;
-  border: 1px solid #fff;
-  top: 3em;
-  left: calc(50% - 2.5em);
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  background-image: url(playerTank.png);
+  background-position: center;
+  background-size: contain;
   background-color: #000;
+}
+#one {
+  top: 120px;
+  right: 120px;
+  transform: rotate(-90deg);
+}
+#two {
+  bottom: 120px;
+  right: 120px;
+}
+#three {
+  bottom: 120px;
+  left: 120px;
 }
 
 .brick {
