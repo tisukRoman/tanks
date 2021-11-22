@@ -1,0 +1,66 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+*,
+::before,
+::after {
+  box-sizing: inherit;
+}
+body {
+  background-color: #000;
+}
+
+.container {
+  margin: 0 auto;
+  width: 2000px;
+  height: 1600px;
+  border: 1px solid #fff;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#player {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: 120px;
+  left: 120px;
+  background-color: #000;
+}
+
+.laser {
+  width: 10px;
+  height: 60px;
+  background-color: #f00;
+  border-radius: 20%;
+  position: absolute;
+  z-index: 10;
+  top: 0px;
+  left: 0px;
+}
+
+.enemy {
+  width: 5em;
+  height: 5em;
+  border: 1px solid #fff;
+  top: 3em;
+  left: calc(50% - 2.5em);
+  background-color: #000;
+}
+
+.brick {
+  display: block;
+  width: 100px;
+  height: 100px;
+  background-color: #000;
+  background-image: url(brick.png);
+}
+
+.emptyBlock {
+  display: block;
+  width: 100px;
+  height: 100px;
+  background-color: #000;
+}
