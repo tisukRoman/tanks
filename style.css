@@ -50,8 +50,8 @@ body {
   background-color: #000;
 }
 #one {
-  top: 120px;
-  right: 120px;
+  top: 620px;
+  right: 420px;
   transform: rotate(-90deg);
 }
 #two {
@@ -61,6 +61,7 @@ body {
 #three {
   bottom: 120px;
   left: 120px;
+  transform: rotate(90deg);
 }
 
 .brick {
