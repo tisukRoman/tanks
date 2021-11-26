@@ -442,10 +442,13 @@ const startEnemy = (enemy) => {
 // ----------------------------------------- // Main Function
 function main() {
 
+    // RENDER LEVEL
     renderer.renderArea();
 
+    // MAKING ENEMIES ALIVE
     document.querySelectorAll('.enemy').forEach((enemy) => startEnemy(enemy));
 
+    // EVENT LISTENERS
     document.addEventListener('keydown', (event) => {
         getDirection(player);
         if (event.key === 'ArrowLeft') {
