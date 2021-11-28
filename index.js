@@ -256,21 +256,14 @@ const isLaserHitEnemy = (laser) => {
     }
 }
 
-const playerDeath = () => {
+const playerDie = () => {
     player.remove();
-    const isRestart = confirm('You have died... Do you want to restart?');
-    if (isRestart) {
-        window.location.reload();
-    } else {
-        alert('Thanks for playing');
-        window.close();
-    }
 }
 
 const isLaserHitPlayer = (laser) => {
     const playerHitLocation = isIntersectionBetween(player, laser);
     if (playerHitLocation) {
-        playerDeath();
+        playerDie();
     }
 }
 
@@ -439,6 +432,14 @@ const startEnemy = (enemy) => {
     }, 100)
 }
 
+// ------------------------ // Game Functions 
+
+const endGame = (title) => {
+    const isRestart = confirm(`${title}  Wanna restart?`);
+    if (isRestart) { window.location.reload(); return; }
+    else { window.close(); return; }
+}
+
 // ----------------------------------------- // Main Function
 function main() {
 
@@ -471,5 +472,22 @@ function main() {
             shoot(player);
         }
     });
+
+    let killedEnemies = 0;
+    const observer = new MutationObserver(mutations => {
+        let removedNodes = mutations.map(mutation => [...mutation.removedNodes].map(node => node));
+        if (removedNodes.some((elem) => elem.some(node => node.matches('.enemy')))) {
+            killedEnemies++;
+            if (killedEnemies === 3) {
+                endGame('You have won :) ... ')
+            }
+        };
+        if (removedNodes.some((elem) => elem.some(node => node.matches('#player')))) {
+            endGame('You have lost :( ... ')
+        }
+    })
+    observer.observe(gameContainer, {
+        childList: true
+    })
 }
 main();
